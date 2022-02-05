@@ -1,0 +1,6 @@
+mmfashion/checkpoint/vgg16.pth
+mmfashion/checkpoint/Retrieve/vgg/global/epoch_100.pth
+mmfashion/.eggs
+mmfashion/build
+mmfashion/dist
+mmfashion/mmfashion.egg-info
