@@ -31,7 +31,7 @@ def parse_args():
         default='checkpoint/Retrieve/vgg/global/epoch_100.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
-        '--use_cuda', type=bool, default=False, help='use gpu or not')
+        '--use_cuda', type=bool, default=True, help='use gpu or not')
     args = parser.parse_args()
     return args
 
@@ -69,20 +69,22 @@ def main():
     cfg = Config.fromfile(args.config)
 
     model = build_retriever(cfg.model)
-    load_checkpoint(model, args.checkpoint, map_location=torch.device('cpu'))
+    load_checkpoint(model, args.checkpoint, map_location=(torch.device(
+        'cuda:0') if torch.cuda.is_available() else torch.device('cpu')))
     print('load checkpoint from {}'.format(args.checkpoint))
 
-    if args.use_cuda:
+    if torch.cuda.is_available():
         model.cuda()
     model.eval()
 
-    img_tensor = get_img_tensor(args.input, args.use_cuda)
+    img_tensor = get_img_tensor(args.input, torch.cuda.is_available())
 
     query_feat = model(img_tensor, landmark=None, return_loss=False)
     query_feat = query_feat.data.cpu().numpy()
 
     gallery_set = build_dataset(cfg.data.gallery)
-    gallery_embeds = _process_embeds(gallery_set, model, cfg)
+    gallery_embeds = _process_embeds(
+        gallery_set, model, cfg, use_cuda=torch.cuda.is_available())
 
     retriever = ClothesRetriever(cfg.data.gallery.img_file, cfg.data_root,
                                  cfg.data.gallery.img_path)
