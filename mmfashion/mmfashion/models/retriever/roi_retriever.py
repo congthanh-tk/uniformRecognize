@@ -104,7 +104,6 @@ class RoIRetriever(BaseRetriever):
 
     def simple_test(self, x, landmarks=None):
         """Test single image"""
-        x = x.unsqueeze(0)
         if landmarks is not None:
           landmarks = landmarks.unsqueeze(0)
         feat = self.extract_feat(x, landmarks)
