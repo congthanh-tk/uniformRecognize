@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument(
         '--checkpoint',
         help='checkpoint file',
-        default='checkpoint/CPVTON/TOM/latest.pth')
+        default='checkpoint/CPVTON/TOM/TOM.pth')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument(
         '--launcher',

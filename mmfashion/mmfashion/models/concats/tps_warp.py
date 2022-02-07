@@ -28,8 +28,9 @@ class TPSWarp(nn.Module):
         self.gridX = torch.FloatTensor(self.gridX).unsqueeze(0).unsqueeze(3)
         self.gridY = torch.FloatTensor(self.gridY).unsqueeze(0).unsqueeze(3)
         # put on gpu
-        self.gridX = self.gridX.cuda()
-        self.gridY = self.gridY.cuda()
+        if torch.cuda.is_available():
+            self.gridX = self.gridX.cuda()
+            self.gridY = self.gridY.cuda()
 
         # init regular grid for control points P_i
         if use_regular_grid:
@@ -48,10 +49,11 @@ class TPSWarp(nn.Module):
             self.P_Y = P_Y.unsqueeze(2).unsqueeze(3).unsqueeze(4).transpose(
                 0, 4)
             # put on gpu
-            self.P_X = self.P_X.cuda()
-            self.P_X_base = self.P_X_base.cuda()
-            self.P_Y = self.P_Y.cuda()
-            self.P_Y_base = self.P_Y_base.cuda()
+            if torch.cuda.is_available():
+                self.P_X = self.P_X.cuda()
+                self.P_X_base = self.P_X_base.cuda()
+                self.P_Y = self.P_Y.cuda()
+                self.P_Y_base = self.P_Y_base.cuda()
 
     def compute_L_inverse(self, X, Y):
         N = X.size()[0]  # num of points (along dim 0)
@@ -71,7 +73,8 @@ class TPSWarp(nn.Module):
         L = torch.cat((torch.cat(
             (K, P), 1), torch.cat((P.transpose(0, 1), Z), 1)), 0)
         Li = torch.inverse(L)
-        Li = Li.cuda()
+        if torch.cuda.is_available():
+            Li = Li.cuda()
         return Li
 
     def apply_transformation(self, theta, points):
