@@ -34,23 +34,23 @@ class RoIRetriever(BaseRetriever):
 
         self.init_weights(pretrained=pretrained)
 
-    # def extract_feat(self, x, landmarks):
-    #     x = self.backbone(x)
-    #     global_x = self.global_pool(x)
-    #     global_x = global_x.view(global_x.size(0), -1)
-
-    #     if landmarks is not None:
-    #         local_x = self.roi_pool(x, landmarks)
-    #     else:
-    #         local_x = None
-
-    #     x = self.concat(global_x, local_x)
-    #     return x
-
-    def extract_feat(self, x):
+    def extract_feat(self, x, landmarks):
         x = self.backbone(x)
         global_x = self.global_pool(x)
-        return global_x
+        global_x = global_x.view(global_x.size(0), -1)
+
+        if landmarks is not None:
+            local_x = self.roi_pool(x, landmarks)
+        else:
+            local_x = None
+
+        x = self.concat(global_x, local_x)
+        return x
+
+    # def extract_feat(self, x):
+    #     x = self.backbone(x)
+    #     global_x = self.global_pool(x)
+    #     return global_x
 
     def forward_train(self,
                       anchor,
@@ -104,7 +104,10 @@ class RoIRetriever(BaseRetriever):
 
     def simple_test(self, x, landmarks=None):
         """Test single image"""
-        feat = self.extract_feat(x)
+        x = x.unsqueeze(0)
+        if landmarks is not None:
+          landmarks = landmarks.unsqueeze(0)
+        feat = self.extract_feat(x, landmarks)
         embed = self.embed_extractor.forward_test(feat)[0]
         return embed
 
