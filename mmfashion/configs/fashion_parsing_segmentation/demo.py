@@ -1,7 +1,7 @@
 import argparse
 
-from mmdet.apis import inference_detector, init_detector, show_result
-
+from mmdet.apis import inference_detector, init_detector
+from mmdet.models.detectors import BaseDetector
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -9,7 +9,7 @@ def parse_args():
     parser.add_argument(
         '--config',
         help='mmfashion config file path',
-        default='configs/mmfashion/mask_rcnn_r50_fpn_1x.py')
+        default='configs/fashion_parsing_segmentation/mask_rcnn_r50_fpn_1x.py')
     parser.add_argument(
         '--checkpoint',
         type=str,
@@ -29,7 +29,7 @@ def main():
     args = parse_args()
 
     # build the model from a config file and a checkpoint file
-    model = init_detector(args.config, args.checkpoint, device='cuda:0')
+    model = init_detector(args.config, args.checkpoint, device='cpu')
 
     # test a single image and show the results
     img = args.input
@@ -37,7 +37,7 @@ def main():
 
     # visualize the results in a new window
     # or save the visualization results to image files
-    show_result(
+    BaseDetector.show_result(
         img, result, model.CLASSES, out_file=img.split('.')[0] + '_result.jpg')
 
 
